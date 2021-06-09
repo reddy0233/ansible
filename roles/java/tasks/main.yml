@@ -1,0 +1,16 @@
+---
+- name: install java in debian
+  apt:
+    name: "{{ java_deb }}"
+    state: latest
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+
+- name: install java in redhat
+  yum:
+    name: "{{ java_rhel }}"
+    state: latest
+    update_cache: yes
+  when: ansible_os_family == "RedHat"
+

@@ -1,0 +1,12 @@
+---
+- name: service restart in debian
+  service: 
+    name: apache2
+    state: restarted
+  when: ansible_os_family == "Debian"
+  
+- name: service restart in RedHat
+  service: 
+    name: httpd
+    state: restarted
+  when: ansible_os_family == "RedHat"

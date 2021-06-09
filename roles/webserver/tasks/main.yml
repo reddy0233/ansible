@@ -1,0 +1,21 @@
+---
+- name: installing webserver in debian
+  apt:
+      name: apache2
+      state: latest
+  when: ansible_os_family == "Debian"
+
+- name: installing webserver in redhat
+  yum:
+      name: httpd
+      state: latest
+  when: ansible_os_family == "RedHat"
+
+- name: copy file
+  template:
+      src: index.j2
+      dest: /var/www/html/index.html
+  notify:
+      - service restart in debian
+      - service restart in RedHat
+
