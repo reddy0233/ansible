@@ -1,0 +1,27 @@
+---
+- hosts: all
+  become: yes
+  tasks: 
+    - name: install a package in ubuntu
+      apt:
+        name: 
+          - git
+          - wget
+          - tree
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "Debian"  
+
+    - name: install a package in redhat
+      yum: 
+        name: 
+          - git
+          - wget
+          - tree
+        state: present
+        update_cache: yes
+      when: ansible_os_family == "RedHat"     
+   
+
+
+

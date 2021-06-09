@@ -1,0 +1,42 @@
+---
+- hosts: random
+  become: true
+  tasks:
+      - name: installing webserver in debian
+        apt:
+           name: apache2
+           state: latest
+        when: ansible_os_family == "Debian"
+         
+      - name: copy file
+        template:
+           src: ./index.j2
+           dest: /var/www/html/index.j2
+        notify: 
+           - service restart in debian
+           
+
+     
+  handlers:   
+      - name: service restart in debian
+        service: 
+          name: apache2
+          state: restarted
+        when: ansible_os_family == "Debian"
+        
+        
+      
+
+      
+
+
+      
+        
+      
+           
+
+
+
+
+
+
