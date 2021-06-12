@@ -1,0 +1,13 @@
+---
+- name: copy the artifact from local to target machine
+  copy: 
+     src: /home/devops/workspace/end_to_end/applogin/target/applogin-1.3.war
+     dest: /tmp
+
+- name: deploy to artifact tomcat
+  copy: 
+     src: /tmp/applogin-1.3.war
+     dest: /opt/tomcat/latest/webapps/
+     remote_src: yes
+  notify: 
+    - restart tomcat     

@@ -1,0 +1,71 @@
+---
+- name: creating system user
+  user:
+     name: tomcat
+     home: /opt/tomcat
+     shell: /bin/false
+
+- name: downloading the tar file
+  get_url:
+     url: https://www-eu.apache.org/dist/tomcat/tomcat-9/v{{ VERSION }}/bin/apache-tomcat-{{ VERSION }}.tar.gz 
+     dest: /tmp
+
+- name: extract the tar file to /opt/tomcat
+  unarchive:
+     src: /tmp/apache-tomcat-{{ VERSION }}.tar.gz
+     dest: /opt/tomcat/
+     remote_src: yes
+
+- name: create symblink
+  file:
+     src: /opt/tomcat/apache-tomcat-{{ VERSION }}  
+     dest: /opt/tomcat/latest
+     state: link
+
+
+- name: change the owner of /opt/tomcat
+  file: 
+     path: /opt/tomcat
+     owner: tomcat
+     group: tomcat
+     recurse: yes
+
+- name: give the executable permissions
+  shell: sudo sh -c 'chmod +x /opt/tomcat/latest/bin/*.sh'  
+
+- name: copy tomcat service file
+  template: 
+     src: tomcat.service.j2
+     dest: /etc/systemd/system/tomcat.service
+
+- name: reload demon
+  systemd:
+     name: tomcat
+     state: restarted
+     enabled: yes
+  
+
+- name: create role
+  lineinfile:
+     path: /opt/tomcat/latest/conf/tomcat-users.xml
+     insertbefore: '^</tomcat-users>'
+     line: "{{ item }}"
+  with_items:
+    - <role rolename="admin-gui"/>
+    - <role rolename="manager-gui"/>
+    - <user username="admin" password="admin_password" roles="admin-gui,manager-gui"/>
+
+- name: delete fire wall
+  lineinfile: 
+     path: /opt/tomcat/latest/webapps/host-manager/META-INF/context.xml
+     state: absent
+     regexp: "{{ item }}"
+  with_items:
+    - <Valve className="org.apache.catalina.valves.RemoteAddrValve"
+    - allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1|41.41.41.41" />
+
+- name: service restart
+  service:
+     name: tomcat
+     state: restarted    
+          
